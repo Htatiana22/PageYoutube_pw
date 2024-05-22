@@ -24,4 +24,32 @@ export class searchSong implements IsearchSong {
         await this.page.click('button#search-icon-legacy');
     }
 
+    async selectRandomSong(): Promise<string | undefined> {
+        await this.page.waitForSelector("ytd-video-renderer");
+    
+        const videos = await this.page.$$("ytd-video-renderer");
+        const randomIndex = Math.floor(Math.random() * videos.length);
+        const video = videos[randomIndex];
+    
+        const videoTitle = await video.$eval("#video-title", (el) =>
+          el.textContent?.trim()
+        );
+    
+        const getVideoByIndex = `(//a[@class="yt-simple-endpoint style-scope ytd-video-renderer"])[${
+          randomIndex + 1
+        }]`;
+        await this.page.click(getVideoByIndex);
+    
+        return videoTitle;
+      }
+    
+      async getSelectedSongTitle(): Promise<string | undefined> {
+        await this.page.waitForSelector("yt-formatted-string.ytd-watch-metadata");
+        const playingVideoTitle = await this.page.$eval(
+          "yt-formatted-string.ytd-watch-metadata",
+          (el) => el.textContent?.trim()
+        );
+    
+        return playingVideoTitle;
+    }
 }
