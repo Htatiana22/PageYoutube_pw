@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test'
 import { IsearchSong } from '../interfaces/youtube.ui';
+import { VideoSelector } from '../utils/videoSelector';
 
 export class searchSong implements IsearchSong {
 
@@ -28,8 +29,8 @@ export class searchSong implements IsearchSong {
         await this.page.waitForSelector("ytd-video-renderer");
     
         const videos = await this.page.$$("ytd-video-renderer");
-        const randomIndex = Math.floor(Math.random() * videos.length);
-        const video = videos[randomIndex];
+
+        const{video, index: randomIndex} = VideoSelector.getRandomVideo(videos);
     
         const videoTitle = await video.$eval("#video-title", (el) =>
           el.textContent?.trim()
@@ -45,6 +46,7 @@ export class searchSong implements IsearchSong {
     
       async getSelectedSongTitle(): Promise<string | undefined> {
         await this.page.waitForSelector("yt-formatted-string.ytd-watch-metadata");
+        
         const playingVideoTitle = await this.page.$eval(
           "yt-formatted-string.ytd-watch-metadata",
           (el) => el.textContent?.trim()
